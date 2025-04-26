@@ -1,0 +1,755 @@
+/* 基本要素スタイル */
+html, body {
+  scroll-behavior: smooth; /* スムーズスクロール */
+  overflow-y: auto; /* スクロールを有効化（常にスクロール可能） */
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #ff8c00;
+  color: #0a1d4d;
+  font-size: 14px;
+}
+
+textarea:focus, input:focus {
+  outline: none;
+}
+
+/* コンテナと基本レイアウト */
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* メイン画面と設定画面 */
+#mainScreen {
+  display: block;  /* 初期状態でmainScreenを表示 */
+}
+
+#settingScreen {
+  display: none;  /* 初期状態でsettingScreenは非表示 */
+  position: fixed; /* 固定表示にする */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* スクロール可能にする */
+  background-color: white; /* 背景を白にする */
+  z-index: 1000; /* 他の要素よりも上に表示 */
+}
+
+/* PCやタブレット表示時の設定 */
+@media screen and (min-width: 769px) {
+  #mainScreen,
+  #settingScreen {
+    display: block;
+    position: absolute; /* 並べて表示 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+  }
+
+  #settingScreen {
+    display: none; /* 初期状態ではsettingScreenを非表示 */
+  }
+}
+
+/* スマホ */
+@media screen and (max-width: 768px) {
+  #mainScreen {
+    display: block;  /* スマホ表示時もhome画面は表示 */
+  }
+
+  #settingScreen {
+    display: none; /* スマホではsettingScreenを非表示 */
+  }
+}
+
+/* タイトルとヘッダー要素 */
+.title {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #dbc508;
+  margin-bottom: 10px;
+}
+
+/* 認証関連 */
+.auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.auth input {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.auth button {
+  padding: 8px 14px;
+  background-color: #ffe600;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  color: #0a1d4d;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* メッセージリスト */
+.message-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 100vw; /* ← 最大幅をウィンドウに制限にゃ！ */
+  box-sizing: border-box;
+}
+
+.message-list li {
+  background-color: #ffffff; 
+  color: #0a1d4d; /* ← 文字色は紺のままにゃ */
+  padding: 7px 7px;
+  font-family: 'Segoe UI', sans-serif;
+  border-radius: 16px;
+  margin: 5px 3px;
+  font-size: 0.7em;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  box-shadow: none;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  margin-bottom: 4px; /* ← 余白を縮める */
+}
+
+.message-header span {
+  color: #0a1d4d;
+}
+
+.message-actions {
+  display: flex;
+  gap: 6px;
+  font-size: 0.75rem;
+  margin-bottom: 0; /* ← 下余白なくす */
+}
+
+.message-text {
+  font-size: 0.85rem;
+  line-height: 1.3;
+  margin-bottom: 2px; /* ← 縦の隙間を縮小 */
+}
+
+.message-text a {
+  color: #4d5802;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.message-time {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.message-user,
+.count-text {
+  font-size: 0.85em;     /* ← 前より少し大きくにゃ！ */
+  color: #a0a7b9;
+  font-weight: bold;
+  margin-left: 3px;      /* ← アイコンとの隙間を狭くにゃ */
+}
+
+.message.own,
+.message.other {
+  margin: 5px auto;
+  max-width: 90%;
+  background-color: #ffffff;
+  border-radius: 16px;
+  text-align: left;
+}
+
+/* タイムスタンプ */
+.timestamp {
+  font-size: 0.75rem;
+  color: #cccccc;
+  position: absolute;
+  bottom: 6px;
+  right: 12px;
+}
+
+/* アイコンと操作ボタン */
+.icon-btn {
+  width: 20px;
+  height: 20px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.icon-with-count {
+  display: flex;
+  align-items: center;
+  gap: 3px;              /* ← gapを6px→3pxに縮めるにゃ */
+}
+
+.user-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.likeBtn, .deleteBtn {
+  background: none;
+  border: none;
+  color: #ffe600;
+  font-size: 1rem;
+  margin-top: 4px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+/* メニュー関連 */
+.menu-toggle {
+  width: 28px;
+  height: 28px;
+  background: url("ten.png") no-repeat center;
+  background-size: contain;
+  border: none;
+  cursor: pointer;
+}
+
+.menu-options {
+  display: none;
+  position: absolute;
+  right: 10px;
+  bottom: -40px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 6px;
+  z-index: 10;
+}
+
+.menu-options.show {
+  display: block;
+}
+
+.menu-options button {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ハンバーガーメニュー */
+.hamburger {
+  position: fixed;       /* ← 固定表示に変更！ */
+  top: 10px;             /* ← 画面上から10px */
+  right: 10px;           /* ← 画面右から10px */
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #ffffff;
+  z-index: 1002;         /* ← 他要素より前面に表示 */
+}
+
+/* 投稿フォーム */
+.post-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.post-form input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+  font-size: 0.9rem;
+}
+
+.post-form button {
+  padding: 10px 20px;
+  background-color: #ffe600;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  color: #0a1d4d;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.post-form-wrapper {
+  display: block;
+  opacity: 0;
+  transition: all 0.3s ease;
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 700px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  border-radius: 10px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+#postFormWrapper .cancel-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  z-index: 20; /* ×ボタンが投稿ボタンより手前に表示されるように */
+}
+
+#postFormWrapper button.reply-send-btn,
+#postFormWrapper button:not(.cancel-btn) {
+  display: block;
+  margin-left: auto;     /* ← これが右寄せの決め手！ */
+  margin-top: 8px;
+}
+
+/* 投稿ボタン関連 */
+#toggleFormBtn {
+  position: fixed;
+  bottom: 70px; /* ← nav帯の上になるように変更 */
+  right: 20px;
+  display: inline-block;
+  width: 80px;
+  height: 40px;
+  border: none;
+  border-radius: 18px;
+  background-color: #ffe600;
+  color: #0a1d4d;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  font-family: 'Segoe UI', sans-serif;
+  z-index: 10;
+}
+
+#toggleFormBtn.hide {
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+}
+
+/* 投稿ボックス */
+.post-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  overflow: hidden;
+  width: 100%;
+  height: 40px;
+  background: white;
+  margin-top: 10px;
+}
+
+.post-form-row {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px; /* ← 入力とボタンの間隔 */
+}
+
+.post-form-row input {
+  flex: 1;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 0.9rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-family: 'Segoe UI', sans-serif;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.post-btn {
+  height: 40px;
+  padding: 0 20px;
+  background-color: #ffe600;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  color: #0a1d4d;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* メッセージ入力エリア */
+#messageInput {
+  width: 450px;           
+  min-height: 10px;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border-radius: 20px;
+  height: 40px;
+  font-family: 'Segoe UI', sans-serif;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#messageInput:focus {
+  outline: 0px solid rgb(19, 17, 122); /* ← フォーカス時に黒くなる原因 */
+}
+
+/* 送信ボタン */
+.submit-post-btn {
+  display: block;              /* ← 幅を効かせるため */
+  max-width: 80px;            /* ← 必要に応じて制限 */
+  margin-top: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 20px;
+  background-color: #ffe600;
+  color: #0a1d4d;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* 返信エリア */
+.reply-box {
+  margin-top: 8px;
+  padding: 10px;
+  border-left: 1px solid #ffffff;
+  background: #fafdd6;
+  border-radius: 8px;
+}
+
+.reply-list {
+  margin-bottom: 6px;
+}
+
+.reply-item {
+  font-size: 0.85em;
+  margin-bottom: 4px;
+  color: #0a1d4d;
+}
+
+.reply-item span {
+  font-size: 0.75em;
+  color: #888;
+  margin-left: 6px;
+}
+
+.reply-input {
+  width: 100%;
+  padding: 8px;
+  font-family: 'Segoe UI', sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  resize: vertical;
+  font-size: 0.9em;
+  box-sizing: border-box;
+}
+
+.reply-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.reply-char-count {
+  font-size: 0.8em;
+  color: #0a1d4d;
+}
+
+.reply-send-btn {
+  padding: 6px 12px;
+  margin-left: 6px;
+  background: #ffe600;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  color: #0a1d4d;
+  cursor: pointer;
+}
+
+.reply-divider {
+  border-top: 1px solid #ccc;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.replies div {
+  margin-top: 4px;
+  font-size: 0.85em;
+  color: #333;
+}
+
+/* 検索ボックス */
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  overflow: hidden;
+  width: 300px;
+  height: 40px;
+  background: white;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  padding: 0 12px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', sans-serif;
+  outline: none;
+}
+
+.search-box .search-btn {
+  width: 50px;
+  height: 100%;
+  border: none;
+  background: url("search-icon.png") no-repeat center;
+  background-size: 18px 18px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+/* ユーザー名表示ボックス */
+.displayname-box {
+  width: 250px;
+  height: 40px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.displayname-box input {
+  border: none;
+  padding: 0 12px;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', sans-serif;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* タイムライン */
+.timeline-tabs {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+  gap: 10px;
+}
+
+.tab-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* ← 丸ボタンにする！ */
+  border: none;
+  background-color: #e0e0e0;
+  color: #0a1d4d;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tab-btn.active {
+  background-color: #ffe600;
+}
+
+/* ナビゲーション */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background-color: #3a4d0a;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 900;
+  padding: 0 10px;
+}
+
+.nav-btn {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: none;
+  color: #ffe600;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* スクロールボタン */
+#scrollButtons {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.scroll-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(209, 209, 207, 0.6); /* 薄い黄色 + 透過 */
+  color: #0a1d4d;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background-color 0.3s;
+}
+
+.scroll-btn:hover {
+  background-color: rgba(194, 181, 68, 0.693);
+}
+
+/* スライドパネル */
+.slide-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 2000;
+}
+
+.slide-panel.show {
+  transform: translateX(0);
+}
+
+/* 2ちゃん風スタイル */
+.toggle-mode {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #ffe600;
+  color: #0a1d4d;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 6px 12px;
+  cursor: pointer;
+  z-index: 2000;
+}
+
+.old-style {
+  font-family: 'ＭＳ Ｐゴシック', sans-serif;
+  background: #fefefe;
+  color: #000;
+  font-size: 12px;
+}
+
+.old-style .container {
+  max-width: 100%;
+  margin: 0;
+  padding: 10px;
+}
+
+.old-style .message-list li {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #000000;
+  font-family: 'ＭＳ Ｐゴシック', sans-serif;
+  white-space: pre-line;
+}
+
+.old-style .message-header,
+.old-style .message-actions,
+.old-style .icon-btn,
+.old-style .menu-toggle,
+.old-style .menu-options {
+  display: none !important;
+}
+
+/* フォーム項目 */
+.gender-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.gender-box select {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+}
+
+.description-box {
+  margin-top: 20px;
+}
+
+.description-box textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  height: 150px;
+}
+
+.post-form-wrapper.show {
+  opacity: 1;
+  display: block;
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
