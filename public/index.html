@@ -1,732 +1,254 @@
 <!DOCTYPE html>
 <html lang="ja">
-	<!DOCTYPE html>
-	<html lang="ja">
-<!DOCTYPE html>
-<html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <title>fuh</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-	<meta name="theme-color" content="#ff8c00">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a1d4d">
   <link rel="stylesheet" href="style.css" />
-	<link rel="manifest" href="manifest.json" />
-	<link rel="icon" href="assets/icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icon-192.png" />
 
-			<style>
-				body {
-					font-family: 'Segoe UI', sans-serif;
-					margin: 0;
-					padding: 0;
-					overflow-x: hidden; /* ← 横スクロール防止にゃ！ */
-				}
-			</style>
-			<!-- ヘッダーにDMボタンを追加 -->
-		<button onclick="toggleDmList()">📩 DM</button>
-		<script type="module">
-			// Firebase SDK v9（モジュール方式）
-			import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-			import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-			// Your web app's Firebase configuration
-			const firebaseConfig = {
-				apiKey: "AIzaSyDZ7_knmmooX5aTOPi0oDtg9YK7vMsRRUM",
-				authDomain: "i-post-02-fuh.firebaseapp.com",
-				projectId: "i-post-02-fuh",
-				storageBucket: "i-post-02-fuh.firebasestorage.app",
-				messagingSenderId: "697591520408",
-				appId: "1:697591520408:web:2155ea15b02bd1fd6cc4ed"
-			};
-
-
-			const app = initializeApp(firebaseConfig);
-			window.db = getFirestore(app); // グローバルで使えるように
-		</script>
-
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden; /* 横スクロール防止 */
+    }
+  </style>
 </head>
 
-<body onclick="closeAllMenus(event)">
-  <!-- 🔽 画面1: 投稿画面（Home） -->
+<body>
+	<!-- ハンバーガーメニュー本体 -->
+<div id="hamburgerMenu" style="display: none;">
+  <button onclick="window.openHome()" class="menu-btn">Home</button>
+  <div class="menu-divider"></div>
+  <button onclick="window.openProfileScreen()" class="menu-btn">Profile</button>
+  <div class="menu-divider"></div>
+  <button onclick="window.openBookmarks()" class="menu-btn">Bookmarks</button>
+</div>
 
-	<div id="header">
-		
-		<!-- ハンバーガーメニュー -->
-		<button class="hamburger" onclick="toggleMenu()">☰</button>
-		<h1 class="title">fuh</h1>
-	</div>
-
-	<div id="mainScreen">	
+	<!-- フローティングバー -->
+<header id="floatingHeader">
+	<div class="header-top">
+		<img src="icons/icon-top.png" alt="fuh icon" class="logo-icon">
 	
-  <!-- main表示領域 -->
-  <div class="container">
-
-
-	  <!-- 🔍 投稿検索ボックス -->
-		<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-			<div class="search-box">
-				<input type="text" id="searchInput" placeholder="Search" oninput="filterMessages()" />
-				<button type="button" class="search-btn"></button>
-			</div>
-
-		<!-- 上下スクロールボタン -->
-		<div id="scrollButtons">
-			<button class="scroll-btn" onclick="scrollToTop()">↑</button>
-			<button class="scroll-btn" onclick="scrollToBottom()">↓</button>
-		</div>
-
-		<!-- 🔽 Searchのすぐ下に配置 -->
-		<div class="timeline-tabs">
-			<button class="tab-btn active" onclick="switchTimeline('tab1')">1</button>
-			<button class="tab-btn" onclick="switchTimeline('tab2')">2</button>
-			<button class="tab-btn" onclick="switchTimeline('tab3')">3</button>
-			<button class="tab-btn" onclick="switchTimeline('tab4')">4</button>
-		</div>
-		
-
-		<!-- 以下、Postボタンや投稿フォーム、投稿リスト -->
-    <button id="toggleFormBtn" onclick="togglePostForm()">post</button>
-
-		<div id="postFormWrapper" class="post-form-wrapper">
-			<button class="cancel-btn" onclick="togglePostForm()">×</button>
-		
-			<div class="post-form-row">
-				<textarea id="messageInput" placeholder="your message..." oninput="autoGrow(this); updateCharacterCount()" rows="1"></textarea>
-
-				<button class="post-btn" onclick="postLocalMessage()">Post</button>
-			</div>
-		
-			<div id="charCount" style="text-align: right; font-size: 0.8em; margin-top: 4px; color: #0a1d4d;">0 / 300</div>
-		</div>
-		
-
-		
-
-
-    <ul id="messageList" class="message-list"></ul>
-  </div>
-
+		<div class="floating-search-box">
+			<input type="text" id="floatingSearchInput" placeholder="search" oninput="filterMessages()" />
 		</div>
 	</div>
+	
+	<!-- ★ここから追加：サーチボックスの下にタブボタン！ -->
+	<div class="floating-tab-buttons" style="display: flex; justify-content: center; gap: 10px; margin-top: 8px;">
+		<button class="tab-btn active" data-tab="tab1" onclick="switchTab(this)">home</button>
+		<button class="tab-btn" data-tab="tab2" onclick="switchTab(this)">room</button>
+		<button class="tab-btn" data-tab="tab3" onclick="switchTab(this)">studio</button>
+		<button class="tab-btn" data-tab="tab4" onclick="switchTab(this)">station</button>
+	</div>
+	<!-- ★ここまで追加 -->
+	
+</header>
 
-  <!-- 🔽 画面2: 設定画面（Settin） -->
-	<div id="settingScreen" class="slide-panel">
+
+  <!-- ホーム画面 -->
+  <div id="header">
+    <!-- ハンバーガーメニュー -->
+		<button class="hamburger" onclick="window.toggleMenu(event)">
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
+  </div>
+
+
+
+  <div id="homeScreen">	
+    <!-- ホーム画面表示領域 -->
     <div class="container">
-			
-  <!-- 🔽 表示切替ボタンはここに配置するにゃ！ -->
-  <button class="toggle-mode" onclick="toggleViewMode()">change</button>
-      <h2>プロフィール設定</h2>
-	  <!--  プロフィールアイコン -->		
-		<div style="display: flex; align-items: center; gap: 10px;">
-			<div id="profileIconBox" onclick="toggleIconSelector()" style="cursor: pointer;">
-				<img id="profileIcon" src="icons/p-icon-01.png" style="width: 40px; height: 40px; border-radius: 50%;" />
-			</div>
-	  <!--  名前ボックス -->		
-			<div class="displayname-box">
-				<input type="text" id="displayNameInput" placeholder="your name" maxlength="30" oninput="setDisplayName(this.value)" />
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
 
-			</div>
-		</div>
-				<!-- 🔽 アイコン選択UI（最初は非表示） -->
-				<div id="iconSelector" style="display: none; margin-top: 8px;">
-					<div style="display: flex; flex-wrap: wrap; gap: 6px;">
-						<img src="icons/p-icon-01.png" onclick="selectIcon('icons/p-icon-01.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-02.png" onclick="selectIcon('icons/p-icon-02.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-03.png" onclick="selectIcon('icons/p-icon-03.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-04.png" onclick="selectIcon('icons/p-icon-04.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-05.png" onclick="selectIcon('icons/p-icon-05.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-06.png" onclick="selectIcon('icons/p-icon-06.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-07.png" onclick="selectIcon('icons/p-icon-07.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-08.png" onclick="selectIcon('icons/p-icon-08.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-09.png" onclick="selectIcon('icons/p-icon-09.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-10.png" onclick="selectIcon('icons/p-icon-10.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
-						<img src="icons/p-icon-11.png" onclick="selectIcon('icons/p-icon-11.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />  </div>
-				</div>
+        <!-- 上下スクロールボタン -->
+        <div id="scrollButtons">
+          <button class="scroll-btn" onclick="scrollToTop()">↑04<kbd></kbd></button>
+          <button class="scroll-btn" onclick="scrollToBottom()">↓</button>
+        </div>
+
+
+      
+        <!-- Postボタンと投稿フォーム -->
+				<button id="toggleFormBtn" type="button" onclick="togglePostForm()">post</button>
+
+        <div id="postFormWrapper" class="post-form-wrapper">
+          <button class="cancel-btn" onclick="togglePostForm()">×</button>
+        
+          <div class="post-form-row">
+            <textarea id="messageInput" placeholder="your message..." oninput="autoGrow(this); updateCharacterCount()" rows="1"></textarea>
+						<button class="post-btn" onclick="postLocalMessage()">post!</button>
+          </div>
+        
+          <div id="charCount" style="text-align: right; font-size: 0.8em; margin-top: 4px; color: #0a1d4d;">0 / 300</div>
+        </div>
+      
+        <!-- メッセージリスト -->
+        <ul id="messageList" class="message-list"></ul>
+      </div>
     </div>
   </div>
 
-	<!-- 性別選択欄 -->
-	<div class="gender-box">
-		<label for="genderSelect">性別:</label>
-		<select id="genderSelect" onchange="saveGender()">
-			<option value="male">男</option>
-			<option value="female">女</option>
-			<option value="unspecified">未設定</option>
-		</select>
-	</div>
-
-	<!-- 説明文入力エリア -->
-	<div class="description-box">
-		<label for="descriptionInput">自己紹介:</label>
-		<textarea id="descriptionInput" placeholder="自己紹介を入力してください..." rows="4" oninput="updateDescription()"></textarea>
-	</div>
-
-	<!-- プロフィールアイコン -->
-	<div id="profileIconBox" onclick="toggleIconSelector()" style="cursor: pointer;">
-		<a href="profile.html">
-			<img id="profileIcon" src="p-icon-01.png" style="width: 40px; height: 40px; border-radius: 50%;" />
-		</a>
-	</div>
-
-  <!-- 🔽 ナビゲーションバー（帯）
-	<div class="bottom-nav">
-	</div>
-		 -->
-
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js').then(registration => {
-        console.log('ServiceWorker登録成功:', registration.scope);
-      }).catch(error => {
-        console.log('ServiceWorker登録失敗:', error);
-      });
-    });
-  }
-
-let savedScrollY = 0;
-
-function switchView(view) {
-  const main = document.getElementById("mainScreen");
-  const setting = document.getElementById("settingScreen");
-
-  if (view === 'setting') {
-    // 📌 Homeのスクロール位置を記録してから非表示
-    savedScrollY = window.scrollY;
-    main.style.display = "none";
-    setting.style.display = "block";
-  } else if (view === 'main') {
-    main.style.display = "block";
-    setting.style.display = "none";
-
-    // 📌 前回のスクロール位置へ戻す
-    window.scrollTo(0, savedScrollY);
-  }
-}
-
-
-
-function togglePostForm() {
-  const form = document.getElementById("postFormWrapper");
-  const button = document.getElementById("toggleFormBtn");
-  form.classList.toggle("show");
-  button.classList.toggle("hide");
-
-  if (form.classList.contains("show")) {
-    document.getElementById("messageInput").focus();
-    updateCharacterCount(); // ←これを追加！
-  }
-}
-
-
-
-function formatRelativeTime(timestamp) {
-  return `${timestamp.getFullYear()}/${timestamp.getMonth() + 1}/${timestamp.getDate()} ${timestamp.getHours()}:${String(timestamp.getMinutes()).padStart(2, '0')}`;
-}
-
-    //* ・・・ボタンの表示切替 *//
-    function toggleMenu(id) {
-      document.querySelectorAll('.menu-options').forEach(el => el.classList.remove('show'));
-      const menu = document.getElementById(`menu-${id}`);
-      if (menu) menu.classList.toggle("show");
-    }
-				async function deletePostFromFirestore(docId, liElement) {
-						const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
-						if (!window.db || !docId) return;
-
-						const confirmDelete = confirm("この投稿を削除しますか？");
-						if (!confirmDelete) return;
-
-						try {
-							await deleteDoc(doc(window.db, "posts", docId));
-							liElement.remove(); // DOMからも削除
-							console.log("🗑 投稿をFirestoreから削除しました：", docId);
-						} catch (e) {
-							console.error("削除失敗：", e);
-						}
-					}
-
-
-    function closeAllMenus(event) {
-      if (!event.target.closest('.menu-toggle')) {
-        document.querySelectorAll('.menu-options').forEach(el => el.classList.remove('show'));
-      }
-    }
-
-		function scrollToTop() {
-			window.scrollTo({ top: 0, behavior: 'smooth' });
-		}
-
-		function scrollToBottom() {
-			window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-		}
-
-
-    let messageCount = 0;
-		function postLocalMessage() {
-				const input = document.getElementById("messageInput");
-				const text = input.value.trim();
-				const type = currentTimeline;
-
-				if (text === "") {
-					alert("投稿文を入力してください。");
-					return;
-				}
-
-				if (text.length > 300) {
-					alert("文字数は300文字以内にしてください。");
-					return;
-				}
-
-				const linkCount = (text.match(/https?:\/\/[^\s]+/g) || []).length;
-				if (linkCount > 1) {
-					alert("2つ以上のリンクは貼れません。");
-					return;
-				}
-
-				const convertedText = autoLink(text).replace(/\n/g, "<br>");
-				const li = document.createElement("li");
-				li.dataset.timeline = type;
-
-				const now = new Date();
-				const user = document.getElementById("displayNameInput")?.value.trim() || "匿名";
-				const key = `msg-${messageCount++}`;
-				const savedName = localStorage.getItem("displayName") || "";
-				const isOwn = user === savedName;
-				li.className = "message " + (isOwn ? "own" : "other");
-
-  li.innerHTML = `
-    <div class="message-header">
-			<span class="message-user">
-				<img src="${document.getElementById("profileIcon").src}" class="user-icon" />
-				${user}
-			</span>
-			<div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
-				${renderReplyAndLikeCount(key)}
-				<div style="position: relative;">
-					<button class="menu-toggle" onclick="toggleMenu('${key}')"></button>
-					<div class="menu-options" id="menu-${key}">
-						<button><img src="icons/icon-delete.png" style="width: 16px; height: 16px;" /> 削除</button>
-					</div>
-				</div>
-				<span class="message-time">${formatRelativeTime(now)}</span>
-			</div>
-		</div>
-
-    <div class="message-text" data-original="${text}">${convertedText}</div>
-
-    </div>
-    <div class="reply-box" id="replyBox-${key}" style="display: none;">
-      <div class="reply-list" id="replies-${key}"></div>
-      <textarea
-        class="reply-input"
-        id="replyInput-${key}"
-        rows="1"
-        placeholder="your message…"
-        oninput="updateReplyCharCount('${key}')"
-        style="resize: none;"
-      ></textarea>
-      <div class="reply-meta">
-        <span class="reply-char-count" id="replyCharCount-${key}">0 / 300</span>
-        <button class="reply-send-btn" onclick="submitReply('${key}')">reply</button>
+  <!-- ブックマーク画面 -->
+  <div id="bookmarkScreen" class="slide-panel" style="display: none;">
+    <div class="bookmark-inner">
+      <div class="container" style="z-index: 2001; position: relative;">
+        <!-- ブックマーク画面用ハンバーガーメニュー -->
+        <button class="hamburger" onclick="window.toggleMenu(event)">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
-    </div>
-  `;
 
-  document.getElementById("messageList").prepend(li);
-  input.value = "";
-  input.rows = 1;
-  input.style.height = "auto";
-  updateCharacterCount();
-  togglePostForm();
-  li.scrollIntoView({ behavior: "smooth", block: "start" });
-	import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js").then(({ collection, addDoc, serverTimestamp }) => {
-      const postData = {
-        user: user,
-        text: text,
-        icon: document.getElementById("profileIcon").src,
-        time: serverTimestamp(),
-        timeline: type
-      };
-
-			addDoc(collection(window.db, "posts"), postData)
-			.then(docRef => {
-				console.log("📦 Firestore に投稿を保存しました：", docRef.id);
-				li.dataset.docId = docRef.id; // ← 投稿DOMにFirestoreのIDを保存
-			})
-			.catch(error => {
-				console.error("🔥 Firestore 保存エラー:", error);
-			});
-
-    });
-  }
-		
-	  function toggleViewMode() {
-    document.body.classList.toggle("old-style");
-  	}
-
-		function toggleView(view) {
-			const main = document.getElementById("mainScreen");
-			const setting = document.getElementById("settingScreen");
-
-			if (view === 'setting') {
-				main.style.display = "none";  // Main画面を非表示
-				setting.style.display = "block";  // Setting画面を表示
-			} else if (view === 'main') {
-				main.style.display = "block";  // Main画面を表示
-				setting.style.display = "none";  // Setting画面を非表示
-			}
-		}
-
-		function updateReplyCharCount(key) {
-			const input = document.getElementById(`replyInput-${key}`);
-			const count = input.value.length;
-			const countDisplay = document.getElementById(`replyCharCount-${key}`);
-			countDisplay.textContent = `${count} / 300`;
-			countDisplay.style.color = count > 300 ? "red" : "#0a1d4d";
-		}
-
-		async function submitReply(postId) {
-  const input = document.getElementById(`replyInput-${postId}`);
-  const text = input.value.trim();
-
-  if (!text) return;
-  if (text.length > 1000) {
-    alert("返信は1000文字以内です");
-    return;
-  }
-
-  const user = document.getElementById("displayNameInput")?.value.trim() || "匿名";
-  const time = serverTimestamp(); // Firestoreのタイムスタンプを使用
-
-  // Firestoreの返信データ保存
-  if (!window.db) return;
-
-  const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
-
-  try {
-    const replyData = {
-      user: user,
-      text: text,
-      time: time,
-      postId: postId,  // 返信元の投稿ID
-    };
-
-    await addDoc(collection(window.db, "replies"), replyData); // Firestoreに保存
-
-    // 返信をUIに表示
-    renderReplies(postId);
-
-    // 入力フィールドをリセット
-    input.value = "";
-    updateReplyCharCount(postId);
-  } catch (error) {
-    console.error("返信の保存に失敗しました:", error);
-  }
-}
-
-
-
-async function renderReplies(postId) {
-  const container = document.getElementById(`replies-${postId}`);
-  container.innerHTML = "";  // 既存の内容をリセット
-
-  if (!window.db) return;
-
-  const { collection, query, where, getDocs, orderBy } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
-
-  const q = query(collection(window.db, "replies"), where("postId", "==", postId), orderBy("time", "asc"));
-  
-  try {
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(doc => {
-      const reply = doc.data();
-      const div = document.createElement("div");
-      const timeStr = formatRelativeTime(reply.time.toDate());
-      div.className = "reply-item";
-      const convertedReply = reply.text.replace(/\n/g, "<br>");
-      div.innerHTML = `<strong>${reply.user}</strong>: ${convertedReply} <span style="font-size: 0.75em; color: #999;">${timeStr}</span>`;
-
-      container.appendChild(div);
-    });
-  } catch (error) {
-    console.error("返信の表示に失敗しました:", error);
-  }
-}
-
-
-
-		function renderReplyAndLikeCount(key) {
-			const likeCount = likeMap[key]?.size || 0;
-			const replyCount = replyMap[key]?.length || 0;
-
-			return `
-				<div class="icon-with-count">
-					<button class="icon-btn" style="background-image: url('icons/icon-like.png');" title="いいね" onclick="toggleLike('${key}')"></button>
-					<span class="count-text" id="likeCount-${key}">${likeCount}</span>
-				</div>
-				<div class="icon-with-count">
-					<button class="icon-btn" style="background-image: url('icons/icon-reply.png');" title="返信" onclick="toggleReplyBox('${key}')"></button>
-					<span class="count-text" id="replyCount-${key}">${replyCount}</span>
-				</div>
-			`;
-		}
-
-
-
-	let currentTimeline = "tab1"; // 初期は1番タブ
-
-function switchTimeline(type) {
-  currentTimeline = type;
-
-  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-  event.target.classList.add("active");
-
-  filterByTimeline();
-}
-
-function filterByTimeline() {
-  const messages = document.querySelectorAll("#messageList li");
-  messages.forEach(msg => {
-    const timelineType = msg.dataset.timeline;
-    if (timelineType === currentTimeline) {
-      msg.style.display = "block";
-    } else {
-      msg.style.display = "none";
-    }
-  });
-}
-
-const likeMap = {};
-const replyMap = {};
-
-function toggleReplyBox(key) {
-  const box = document.getElementById(`replyBox-${key}`);
-  if (box) {
-    box.style.display = box.style.display === "none" ? "block" : "none";
-  }
-}
-
-
-async function toggleLike(postId) {
-  const user = document.getElementById("displayNameInput")?.value.trim() || "匿名";
-
-  if (!window.db) return;
-
-  const { collection, doc, setDoc, getDocs, query, where } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
-
-  try {
-    const likeRef = collection(window.db, "likes");
-    const q = query(likeRef, where("postId", "==", postId), where("user", "==", user));
-
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      alert("すでにいいねしています！");
-      return;
-    }
-
-    // 新しい「いいね」をFirestoreに追加
-    await setDoc(doc(likeRef), {
-      postId: postId,
-      user: user,
-      time: serverTimestamp(),
-    });
-
-    // いいね数のカウントを更新
-    const likeCount = await getDocs(query(collection(window.db, "likes"), where("postId", "==", postId)));
-    document.getElementById(`likeCount-${postId}`).textContent = likeCount.size;
-  } catch (error) {
-    console.error("🔥 いいね保存エラー:", error);
-  }
-}
-
-
-
-
-
-	function updateCharacterCount() {
-  const input = document.getElementById("messageInput");
-  const charCount = document.getElementById("charCount");
-  const postButton = document.querySelector("#postFormWrapper button:not(.cancel-btn)");
-
-  const length = input.value.length;
-  charCount.textContent = `${length} / 300`;
-
-  if (length > 300) {
-    charCount.style.color = "red";
-    postButton.disabled = true;
-  } else {
-    charCount.style.color = "#0a1d4d";
-    postButton.disabled = false;
-  }
-}
-
-	function autoLink(text) {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
-	}
-
-	function filterMessages() {
-  const keyword = document.getElementById("searchInput").value.trim();
-  const messages = document.querySelectorAll("#messageList li");
-
-  messages.forEach(msg => {
-    const textElement = msg.querySelector(".message-text");
-    const originalText = textElement.dataset.original || textElement.textContent;
-
-    // 保存用（初回のみ）
-    if (!textElement.dataset.original) {
-      textElement.dataset.original = originalText;
-    }
-
-    if (keyword === "") {
-      msg.style.display = "block";
-      textElement.innerHTML = originalText;
-    } else if (originalText.includes(keyword)) {
-      msg.style.display = "block";
-
-      // 🔶 一致部分にマークを付けるニャン
-      const highlighted = originalText.replaceAll(keyword, `<mark>${keyword}</mark>`);
-      textElement.innerHTML = highlighted;
-    } else {
-      msg.style.display = "none";
-    }
-  });
-}
-
-function toggleIconSelector() {
-  const selector = document.getElementById("iconSelector");
-  selector.style.display = selector.style.display === "none" ? "block" : "none";
-}
-
-function selectIcon(filename) {
-  document.getElementById("profileIcon").src = filename;
-  localStorage.setItem("profileIcon", filename);
-  document.getElementById("iconSelector").style.display = "none";
-}
-function loadProfileIcon() {
-  const savedIcon = localStorage.getItem("profileIcon") || "icons/p-icon-01.png";
-  document.getElementById("profileIcon").src = savedIcon;
-}
-
-async function loadPostsFromFirestore() {
-  if (!window.db) {
-    console.error("Firestore が初期化されていません");
-    return;
-  }
-
-  const { collection, onSnapshot, query, orderBy } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
-
-  const q = query(collection(window.db, "posts"), orderBy("time", "desc"));
-
-  // 🔁 リアルタイムで監視して反映！
-  onSnapshot(q, snapshot => {
-    document.getElementById("messageList").innerHTML = ""; // 一度全クリア
-    snapshot.forEach(doc => {
-      renderPostFromFirestore(doc.data(), doc.id); // ← docIdを渡す
-      renderLikeCount(doc.id);  // いいね数も表示
-    });
-  });
-}
-
-
-
-
-async function renderLikeCount(postId) {
-  if (!window.db) return; // Firestoreが初期化されていなければ終了
-
-  const { collection, query, where, getDocs } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
-
-  // Firestoreで「いいね」データを検索
-  const q = query(collection(window.db, "likes"), where("postId", "==", postId));
-
-  // クエリを実行し、結果を取得
-  const querySnapshot = await getDocs(q);
-
-  // 取得した結果から「いいね」数を反映
-  document.getElementById(`likeCount-${postId}`).textContent = querySnapshot.size;
-}
-
-
-
-document.addEventListener("DOMContentLoaded", loadProfileIcon);
-document.addEventListener("DOMContentLoaded", () => {
-  loadProfileIcon();
-  loadPostsFromFirestore(); // ← Firestoreの投稿読み込み！
-});
-
-
-//* main-settingの切り替え *//
-function toggleMenu() {
-  const setting = document.getElementById("settingScreen");
-  const main = document.getElementById("mainScreen");
-
-  if (setting.classList.contains("show")) {
-    setting.classList.remove("show");
-    main.style.display = "block";
-    window.scrollTo(0, savedScrollY); // ←これを追加！
-  } else {
-    savedScrollY = window.scrollY; // ←これも追加！
-    setting.classList.add("show");
-    main.style.display = "none";
-  }
-}
-
-function renderPostFromFirestore(post, docId) {
-  const key = `firestore-${Math.random().toString(36).substring(2, 9)}`;
-  const li = document.createElement("li");
-  li.dataset.timeline = post.timeline || "tab1";
-  li.dataset.docId = docId; // ← FirestoreのIDを保存
-
-  const savedName = localStorage.getItem("displayName") || "";
-  const isOwn = (post.user === savedName);
-  li.className = "message " + (isOwn ? "own" : "other");
-
-  const formattedText = autoLink(post.text).replace(/\n/g, "<br>");
-  const date = post.time?.toDate ? post.time.toDate() : new Date();
-
-  li.innerHTML = `
-    <div class="message-header">
-      <span class="message-user">
-        <img src="${post.icon}" class="user-icon" />
-        ${post.user || "匿名"}
-      </span>
-      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
-        ${renderReplyAndLikeCount(key)} <!-- いいね数を表示 -->
-        <div style="position: relative;">
-          <button class="menu-toggle" onclick="toggleMenu('${key}')"></button>
-          <div class="menu-options" id="menu-${key}">
-              <button onclick="deletePostFromFirestore('${docId}', this.closest('li'))">
-								<img src="icons/icon-delete.png" style="width: 16px; height: 16px;" /> 削除
-							</button>
-          </div>
+      <h2>bookmarks</h2>
+      
+      <!-- ブックマーク操作ツールバー -->
+      <div class="bookmark-toolbar">
+        <div class="bookmark-actions">
+          <button id="selectAllBtn" class="bookmark-action-btn" onclick="window.selectAllBookmarks()">All</button>
+          <button id="unselectAllBtn" class="bookmark-action-btn" onclick="window.unselectAllBookmarks()">None</button>
+          <button id="deleteSelectedBtn" class="bookmark-action-btn delete-btn" onclick="window.deleteSelectedBookmarks()">Delete</button>
         </div>
-        <span class="message-time">${formatRelativeTime(date)}</span>
+        <button id="exportBtn" class="export-btn" onclick="window.exportBookmarks()">Export</button>
+      </div>
+      
+      <!-- ブックマークリスト -->
+      <ul id="bookmarkList" class="bookmark-list"></ul>
+      
+      <!-- 空の状態表示 -->
+      <div id="emptyBookmarks" class="empty-bookmarks">
+        <p>No bookmarks yet</p>
+        <p class="empty-hint">Bookmark posts from the option menu</p>
       </div>
     </div>
+  </div>
 
-    <div class="message-text" data-original="${post.text}">${formattedText}</div>
-  `;
+  <!--プロフィール画面） -->
+	<div id="profileScreen" class="slide-panel" style="display: none;">
 
-  document.getElementById("messageList").appendChild(li);
-}
+  <!-- プロフィール画面ヘッダー -->
+  <div class="profile-header">
+    <!-- Googleログインボタン -->
+    <button id="googleLoginBtn" class="google-auth-btn">Sign in with Google</button>
+    <span id="loginEmail" class="login-email-display"></span>
+    
+    <!-- ログアウトボタン -->
+    <button id="logoutBtn" class="google-auth-btn">Logout</button>
+    
+    <!-- ユニークID表示 -->
+    <div class="unique-id-section">
+      <span class="unique-id-label">Unique ID : </span>
+      <span id="profileUsername" class="unique-id-value">-</span>
+    </div>
+  </div>
+
+	
+
+	<div class="profile-inner">
+    <div class="container" style="z-index: 2001; position: relative;">
+      <!-- プロフィール画面用ハンバーガーメニュー -->
+			<button class="hamburger" onclick="window.toggleMenu(event)">
+				<span></span>
+			<span></span>
+			<span></span>
+		</button>
+  </div>
 
 
+			<!-- 表示切替ボタン -->
+    <h2>profile</h2>
+    
+    <!-- プロフィールアイコン -->		
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div id="profileIconBox" onclick="toggleIconSelector()" style="cursor: pointer;">
+        <img id="profileIcon" src="icons/p-icon-01.png" style="width: 40px; height: 40px; border-radius: 50%;" />
+      </div>
+      
+      <!-- 名前ボックス -->		
+      <div class="displayname-box">
+        <input type="text" id="displayNameInput" placeholder="your name" maxlength="10" oninput="setDisplayName(this.value)" />
+      </div>
+    </div>
+    
+    <!-- アイコン選択UI（最初は非表示） -->
+    <div id="iconSelector" style="display: none; margin-top: 8px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        <img src="icons/p-icon-01.png" onclick="selectIcon('icons/p-icon-01.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-02.png" onclick="selectIcon('icons/p-icon-02.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-03.png" onclick="selectIcon('icons/p-icon-03.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-04.png" onclick="selectIcon('icons/p-icon-04.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-05.png" onclick="selectIcon('icons/p-icon-05.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-06.png" onclick="selectIcon('icons/p-icon-06.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-07.png" onclick="selectIcon('icons/p-icon-07.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-08.png" onclick="selectIcon('icons/p-icon-08.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-09.png" onclick="selectIcon('icons/p-icon-09.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-10.png" onclick="selectIcon('icons/p-icon-10.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+        <img src="icons/p-icon-11.png" onclick="selectIcon('icons/p-icon-11.png')" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;" />
+      </div>
+    </div>
+    
+    <!-- 性別選択欄 -->
+    <div class="gender-box">
+      <label for="genderSelect">Identity:</label>
+      <select id="genderSelect" onchange="saveGender()" >
+        <option value="none">---</option>
+        <option value="male">men</option>
+        <option value="female">women</option>
+        <option value="unspecified">other</option>
+      </select>
+    </div>
+
+    <!-- 説明文入力エリア -->
+    <div class="description-box">
+      <label for="descriptionInput">bio:</label>
+      <textarea id="descriptionInput" placeholder="Share a little about you" rows="4" oninput="updateDescription()"></textarea>
+    </div>
+
+		<!-- 自己紹介エリアの下に追加 -->
+		<div style="text-align: center; margin-top: 20px;">
+			<button class="toggle-mode" onclick="toggleViewMode()">change</button>
+		</div>
+  </div>
+	</div>
+</div>
+
+  <!-- Firebase SDK と アプリのスクリプト -->
+  <script type="module" src="script.js"></script>
 
 
+  <!-- ここで通知バー -->
+	<div id="networkStatus">通信状況を確認中...</div>
 
-  function autoGrow(element) {
-    element.style.height = "auto";
-    element.style.height = (element.scrollHeight) + "px";
-  }
-
-	function setDisplayName(name) {
-		localStorage.setItem("displayName", name);
-	}
-	function toggleDmList() {
-  alert("DM機能はまだ未実装です。今後ここにDMリストを表示します！");
-}
-
-  </script>
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const networkStatus = document.getElementById('networkStatus');
+	
+		function showStatus(message, bgColor) {
+			networkStatus.textContent = message;
+			networkStatus.style.background = bgColor; // ★ 背景色を引数で変える
+			networkStatus.classList.add('show');
+		}
+	
+		window.addEventListener('offline', () => {
+			showStatus('✖ disconnected', 'rgba(200, 200, 200, 0.8)'); // 薄いグレー
+		});
+	
+		window.addEventListener('online', () => {
+			showStatus('○ reconnected', 'rgba(150, 255, 150, 0.8)'); // 薄い緑
+			setTimeout(() => {
+				networkStatus.classList.remove('show');
+			}, 3000);
+		});
+	});
+	</script>
 
 
 </body>
